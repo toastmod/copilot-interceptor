@@ -1,0 +1,45 @@
+{
+    "id": "chatcmpl-10sV2himQ1dEtYFD44jj4RJlnkjiNqKa",
+    "usage": {
+        "total_tokens": 373,
+        "completion_tokens": 344,
+        "prompt_tokens": 29
+    },
+    "created": 1789261256,
+    "request_id": null,
+    "model": ".\\gemma4\\gemma-4-E2B-it-BF16.gguf",
+    "tool_choice": null,
+    "seed": null,
+    "top_p": null,
+    "temperature": null,
+    "presence_penalty": null,
+    "frequency_penalty": null,
+    "system_fingerprint": "b10795-6703d7894",
+    "input_user": null,
+    "service_tier": null,
+    "tools": null,
+    "metadata": null,
+    "choices": [
+        {
+            "index": 0,
+            "message": {
+                "role": "assistant",
+                "content": "Ownership is a compile-time system that enforces memory safety by ensuring every piece of data has a single owner, which dictates when that data is automatically freed."
+            },
+            "finish_reason": "stop",
+            "logprobs": null
+        }
+    ],
+    "response_format": null,
+    "timings": {
+        "cache_n": 0,
+        "prompt_n": 29,
+        "prompt_ms": 266.932,
+        "prompt_per_token_ms": 9.204551724137932,
+        "prompt_per_second": 108.64190130819834,
+        "predicted_n": 344,
+        "predicted_ms": 5093.783,
+        "predicted_per_token_ms": 14.850679300291546,
+        "predicted_per_second": 67.33698706835371
+    }
+}

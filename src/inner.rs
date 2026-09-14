@@ -2,7 +2,7 @@ use tokio;
 use warp::{ Filter, sse::Event };
 use std::{ sync::Arc, convert::Infallible };
 
-use crate::openai_client::make_client_request_streaming;
+use crate::intercept::Interceptor;
 use crate::openai_server::{ OpenAiRequest, OpenAiService };
 use tokio_stream::wrappers::ReceiverStream;
 use warp::{ filters::method::head };
@@ -14,9 +14,11 @@ struct CustomError(String);
 impl warp::reject::Reject for CustomError {}
 
 // #[tokio::main]
-pub async fn start_server<T>(addr: ([u8; 4], u16)) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn start_server<I: Interceptor + Send + Sync + 'static>(
+    addr: ([u8; 4], u16),
+    interceptor: I
+) -> Result<(), Box<dyn std::error::Error>> {
     let service = Arc::new(OpenAiService {});
-
     let service_provider = warp::any().map(move || Arc::clone(&service));
 
     let chat_route = warp
@@ -25,18 +27,13 @@ pub async fn start_server<T>(addr: ([u8; 4], u16)) -> Result<(), Box<dyn std::er
         .and(warp::post())
         .and(warp::header::headers_cloned())
         .and(warp::body::json())
-        .and(service_provider.clone())
-        .and_then(
-            |
-                headers: HeaderMap,
-                request_body: OpenAiRequest,
-                service: Arc<OpenAiService>
-            | async move {
-                println!("Incoming Body: {:?}\n\n", request_body);
-                let events = make_client_request_streaming::<T>(request_body, headers).await;
-                Ok::<_, warp::Rejection>(warp::sse::reply(warp::sse::keep_alive().stream(events)))
-            }
-        );
+        .and_then(|headers: HeaderMap, request_body: OpenAiRequest| async move {
+            println!("Incoming Body: {:?}\n\n", request_body);
+
+            let events = I::make_client_request_streaming(request_body, headers);
+
+            Ok::<_, warp::Rejection>(warp::sse::reply(warp::sse::keep_alive().stream(events)))
+        });
 
     let list_models_route = warp
         ::path("models")
