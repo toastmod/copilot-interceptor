@@ -7,6 +7,7 @@ pub use crate::inner::start_server;
 pub use std::convert::Infallible;
 pub use eventsource_stream::Eventsource;
 pub use reqwest::header::{ HeaderMap, HeaderValue };
+pub use reqwest::Client;
 pub use tokio::sync::mpsc;
 pub use tokio_stream::wrappers::ReceiverStream;
 pub use warp::filters::sse::Event;
