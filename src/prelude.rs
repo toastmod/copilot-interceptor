@@ -8,8 +8,9 @@ pub use std::convert::Infallible;
 pub use eventsource_stream::Eventsource;
 pub use reqwest::header::{ HeaderMap, HeaderValue };
 pub use reqwest::Client;
-pub use tokio::sync::mpsc;
-pub use tokio_stream::wrappers::ReceiverStream;
+pub use tokio;
+pub use tokio_stream;
+pub use reqwest;
 pub use warp::filters::sse::Event;
 pub use tokio_stream::StreamExt;
 

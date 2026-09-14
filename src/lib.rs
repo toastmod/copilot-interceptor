@@ -8,6 +8,8 @@ pub mod prelude;
 mod test {
     use std::sync::Arc;
 
+    use tokio_stream::wrappers::ReceiverStream;
+
     use crate::prelude::*;
 
     struct CustomService;
@@ -17,7 +19,7 @@ mod test {
             request_body: OpenAiRequest,
             headers: HeaderMap<HeaderValue>
         ) -> ReceiverStream<Result<warp::filters::sse::Event, Infallible>> {
-            let (tx, rx) = mpsc::channel(1);
+            let (tx, rx) = tokio::sync::mpsc::channel(1);
             let client = reqwest::Client::new();
             println!("Requesting llama.cpp");
             let map = headers.iter().filter_map(|x| {
