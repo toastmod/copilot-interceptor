@@ -82,4 +82,22 @@ impl Interceptor for CustomService {
     ReceiverStream::new(rx)
   }
 }
+
+#[tokio::main]
+async fn main() {
+    let (mut tx, mut rx) = mpsc::channel(1);
+
+    let worker = tokio::spawn(async move {
+        while let Some(e) = rx.recv().await {
+            match e {
+                ServiceEvent::Log(m) => println!("{}", m),
+            }
+        }
+    });
+
+    let server = start_server(([0, 0, 0, 0], 10001), CustomService { tx });
+
+    tokio::join!(server, worker);
+}
+
 ```
