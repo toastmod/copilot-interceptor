@@ -1,8 +1,18 @@
 pub use crate::intercept::Interceptor;
-pub use crate::openai_client;
-pub use crate::openai_server;
+pub use crate::openai_client::UserMessage;
+pub use crate::openai_server::{ OpenAiRequest, OpenAiResponse, OpenAiService };
 pub use crate::inner::start_server;
 
+// Dependencies for minimum working product
+pub use std::convert::Infallible;
+pub use eventsource_stream::Eventsource;
+pub use reqwest::header::{ HeaderMap, HeaderValue };
+pub use tokio::sync::mpsc;
+pub use tokio_stream::wrappers::ReceiverStream;
+pub use warp::filters::sse::Event;
+pub use tokio_stream::StreamExt;
+
+// Extra tools
 pub mod extra {
     pub use crate::http_client;
 }

@@ -92,6 +92,7 @@ pub struct OpenAiService {}
 
 impl Interceptor for OpenAiService {
     fn make_client_request_streaming(
+        interceptor: Arc<Self>,
         request_body: OpenAiRequest,
         headers: HeaderMap<HeaderValue>
     ) -> ReceiverStream<Result<warp::filters::sse::Event, Infallible>> {

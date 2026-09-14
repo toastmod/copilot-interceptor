@@ -19,7 +19,9 @@ pub async fn start_server<I: Interceptor + Send + Sync + 'static>(
     interceptor: I
 ) -> Result<(), Box<dyn std::error::Error>> {
     let service = Arc::new(OpenAiService {});
+    let i = Arc::new(interceptor);
     let service_provider = warp::any().map(move || Arc::clone(&service));
+    let i_provider = warp::any().map(move || Arc::clone(&i));
 
     let chat_route = warp
         ::path("chat")
@@ -27,10 +29,11 @@ pub async fn start_server<I: Interceptor + Send + Sync + 'static>(
         .and(warp::post())
         .and(warp::header::headers_cloned())
         .and(warp::body::json())
-        .and_then(|headers: HeaderMap, request_body: OpenAiRequest| async move {
+        .and(i_provider.clone())
+        .and_then(|headers: HeaderMap, request_body: OpenAiRequest, service: Arc<I>| async move {
             println!("Incoming Body: {:?}\n\n", request_body);
 
-            let events = I::make_client_request_streaming(request_body, headers);
+            let events = I::make_client_request_streaming(service, request_body, headers);
 
             Ok::<_, warp::Rejection>(warp::sse::reply(warp::sse::keep_alive().stream(events)))
         });
