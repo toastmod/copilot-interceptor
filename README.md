@@ -2,13 +2,16 @@
 
 ## Example
 ```rust
+use std::sync::Arc;
+use copilot_interceptor::prelude::{ tokio::sync::mpsc, tokio_stream::wrappers::ReceiverStream, * };
+
 struct CustomService;
 impl Interceptor for CustomService {
   fn make_client_request_streaming(
     service: Arc<Self>,
     request_body: OpenAiRequest,
     headers: HeaderMap<HeaderValue>,
-  ) -> ReceiverStream<Result<warp::filters::sse::Event, Infallible>> {
+  ) -> ReceiverStream<Result<Event, Infallible>> {
     let (tx, rx) = mpsc::channel(1);
     let client = reqwest::Client::new();
     println!("Requesting llama.cpp");
@@ -53,13 +56,13 @@ impl Interceptor for CustomService {
             println!("{:?}", x);
             let event = if let Ok(xx) = x {
               Ok(
-                warp::filters::sse::Event::default()
+                Event::default()
                   .data(xx.data)
                   .id(xx.id)
                   .event(xx.event),
               )
             } else {
-              Ok(warp::filters::sse::Event::default().data("An error occured."))
+              Ok(Event::default().data("An error occured."))
             };
             if tx.send(event).await.is_err() {
               // Receiver dropped, so we can stop.
@@ -69,7 +72,7 @@ impl Interceptor for CustomService {
         }
         Err(e) => {
           println!("Error sending request to llama.cpp: {:?}", e);
-          let event = warp::filters::sse::Event::default()
+          let event = Event::default()
             .data(format!("Error connecting to backend: {}", e));
           let _ = tx.send(Ok(event)).await;
         }
