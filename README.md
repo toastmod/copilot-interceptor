@@ -1,20 +1,29 @@
 # Copilot Interceptor
+This is an experimental tool for building interceptors for VSCode Copilot streams to `llama.cpp`.\
+It can be used to make debuggers or add complex logic to local agents.
 
 ## Example
 ```rust
 use std::sync::Arc;
 use copilot_interceptor::prelude::{ tokio::sync::mpsc, tokio_stream::wrappers::ReceiverStream, * };
 
+// Implement a custom interception service.
 struct CustomService;
 impl Interceptor for CustomService {
   fn make_client_request_streaming(
+    // You will receive an Arc of your service, so consider atomics or mpsc channels. 
     service: Arc<Self>,
     request_body: OpenAiRequest,
     headers: HeaderMap<HeaderValue>,
   ) -> ReceiverStream<Result<Event, Infallible>> {
+
+    // Create an mpsc channel to bridge the incoming and outgoing streams.
     let (tx, rx) = mpsc::channel(1);
+
     let client = reqwest::Client::new();
-    println!("Requesting llama.cpp");
+
+    // This is optional, but you can also manage HTTP header data.
+    // This map whitelists headers from the original request to pass through the intercept.
     let map = headers.iter().filter_map(|x| {
       // Filter in any HTTP headers here...
       if [
@@ -41,9 +50,13 @@ impl Interceptor for CustomService {
     });
     let headers = HeaderMap::from_iter(map);
 
+    // This interceptor passes the request to llama.cpp and streams back the result.
+    println!("Requesting llama.cpp");
     tokio::spawn(async move {
+      // Make a request to your local llama.cpp server.
+      // Make sure to use the `v1/chat/completions` route. (other APIs aren't supported yet)
       match client
-        .post("http://desktop-ttjki31:10000/v1/chat/completions")
+        .post("http://localhost:10000/v1/chat/completions")
         .headers(headers)
         .header("Connection", "keep-alive")
         .json(&request_body)
@@ -55,6 +68,7 @@ impl Interceptor for CustomService {
           while let Some(x) = stream.next().await {
             println!("{:?}", x);
             let event = if let Ok(xx) = x {
+              // TODO: Deserialize xx.data as an OpenAiResponse type 
               Ok(
                 Event::default()
                   .data(xx.data)
@@ -79,12 +93,15 @@ impl Interceptor for CustomService {
       }
     });
 
+    // Your output stream items should be `warp::filter::sse::Event` type.
+    // The "data" value should be an `OpenAiResponse` serialized into a JSON string.
     ReceiverStream::new(rx)
   }
 }
 
 #[tokio::main]
 async fn main() {
+    
     let server = start_server(([0, 0, 0, 0], 10001), CustomService {});
 }
 
