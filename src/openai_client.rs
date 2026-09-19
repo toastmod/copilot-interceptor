@@ -27,5 +27,5 @@ pub struct JsonSchema {
 pub struct ResponseFormat {
     #[serde(rename = "type")]
     pub response_type: String,
-    pub schema: JsonSchema,
+    pub json_schema: JsonSchema,
 }
