@@ -10,7 +10,7 @@ use crate::{ intercept::Interceptor, openai_client::{ self, UserMessage } };
 // --- 1. Define OpenAPI Structures ---
 
 /// Represents a generic request body structure for an OpenAI-like endpoint.
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct OpenAiRequest {
     pub model: String,
     pub messages: Vec<UserMessage>,
@@ -20,7 +20,7 @@ pub struct OpenAiRequest {
 }
 
 /// Represents a single message in the chat history.
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct AgentMessage {
     pub role: Option<String>, // e.g., "system", "user", "assistant"
     pub content: Option<String>,
@@ -29,7 +29,7 @@ pub struct AgentMessage {
 }
 
 /// Represents the response structure from the server.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OpenAiResponse {
     pub choices: Vec<Choice>,
     pub id: Option<String>,
@@ -54,7 +54,7 @@ pub struct OpenAiResponse {
 }
 
 /// Represents the timing statistics for an API request.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Timing {
     pub cache_n: u64,
     pub prompt_n: u64,
@@ -68,7 +68,7 @@ pub struct Timing {
 }
 
 /// Represents a choice in the response (e.g., a generated message).
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Choice {
     pub finish_reason: Option<String>,
     pub index: u32,
@@ -78,7 +78,7 @@ pub struct Choice {
 }
 
 /// Represents usage statistics for the request.
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Usage {
     pub total_tokens: u64,
     pub completion_tokens: u64,
@@ -86,7 +86,7 @@ pub struct Usage {
     pub prompt_tokens_details: PromptTokensDetails,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct PromptTokensDetails {
     pub cached_tokens: u64,
 }
