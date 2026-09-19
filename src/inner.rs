@@ -31,8 +31,6 @@ pub async fn start_server<I: Interceptor + Send + Sync + 'static>(
         .and(warp::body::json())
         .and(i_provider.clone())
         .and_then(|headers: HeaderMap, request_body: OpenAiRequest, service: Arc<I>| async move {
-            println!("Incoming Body: {:?}\n\n", request_body);
-
             let events = I::make_client_request_streaming(service, request_body, headers);
 
             Ok::<_, warp::Rejection>(warp::sse::reply(warp::sse::keep_alive().stream(events)))
