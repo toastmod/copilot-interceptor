@@ -11,8 +11,10 @@ mod test {
     use tokio_stream::wrappers::ReceiverStream;
 
     use crate::prelude::*;
-
     struct CustomService;
+
+    impl CustomService {}
+
     impl Interceptor for CustomService {
         fn make_client_request_streaming(
             service: Arc<Self>,
@@ -62,13 +64,31 @@ mod test {
                         while let Some(x) = stream.next().await {
                             println!("{:?}", x);
                             let event = if let Ok(xx) = x {
-                                Ok(
-                                    warp::filters::sse::Event
-                                        ::default()
-                                        .data(xx.data)
-                                        .id(xx.id)
-                                        .event(xx.event)
-                                )
+                                // Deserialize
+                                let d;
+                                if !xx.data.eq("[DONE]") {
+                                    d = serde_json::from_str::<OpenAiResponse>(&xx.data).unwrap();
+                                    let data_str = serde_json::to_string(&d).unwrap();
+                                    Ok(
+                                        warp::filters::sse::Event
+                                            ::default()
+                                            .data(data_str)
+                                            .id(xx.id)
+                                            .event(xx.event)
+                                    )
+                                } else {
+                                    Ok(
+                                        warp::filters::sse::Event
+                                            ::default()
+                                            .data(xx.data)
+                                            .id(xx.id)
+                                            .event(xx.event)
+                                    )
+                                }
+
+                                // Edit
+
+                                // Relay
                             } else {
                                 Ok(warp::filters::sse::Event::default().data("An error occured."))
                             };
