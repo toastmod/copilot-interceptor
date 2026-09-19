@@ -11,21 +11,21 @@ pub struct UserMessage {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct StructuredOutput {
     #[serde(rename = "type")]
-    datatype: String,
-    properties: Option<Box<StructuredOutput>>,
-    items: Option<Box<StructuredOutput>>,
+    pub datatype: String,
+    pub properties: Option<Box<StructuredOutput>>,
+    pub items: Option<Box<StructuredOutput>>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct JsonSchema {
-    name: String,
-    strict: bool,
-    schema: StructuredOutput,
+    pub name: String,
+    pub strict: bool,
+    pub schema: StructuredOutput,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ResponseFormat {
     #[serde(rename = "type")]
-    response_type: String,
-    schema: JsonSchema,
+    pub response_type: String,
+    pub schema: JsonSchema,
 }
