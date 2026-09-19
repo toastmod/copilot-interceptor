@@ -9,18 +9,10 @@ pub struct UserMessage {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct StructuredOutput {
-    #[serde(rename = "type")]
-    pub datatype: String,
-    pub properties: Option<Box<StructuredOutput>>,
-    pub items: Option<Box<StructuredOutput>>,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
 pub struct JsonSchema {
     pub name: String,
     pub strict: bool,
-    pub schema: StructuredOutput,
+    pub schema: serde_json::Value,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
