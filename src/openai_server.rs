@@ -16,6 +16,7 @@ pub struct OpenAiRequest {
     pub messages: Vec<UserMessage>,
     pub temperature: Option<f32>,
     pub stream: bool,
+    pub response_format: Option<serde_json::Value>,
 }
 
 /// Represents a single message in the chat history.

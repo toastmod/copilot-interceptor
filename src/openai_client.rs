@@ -6,7 +6,6 @@ use serde::{ Deserialize, Serialize };
 pub struct UserMessage {
     pub role: String,
     pub content: String,
-    pub response_format: Option<serde_json::Value>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
