@@ -21,3 +21,15 @@ pub struct ResponseFormat {
     pub response_type: String,
     pub json_schema: JsonSchema,
 }
+
+#[macro_export]
+macro_rules! json_response_format {
+    ($body:tt) => {
+        serde_json
+            ::to_value(ResponseFormat {
+                response_type: "json_schema".to_string(),
+                json_schema: JsonSchema $body,
+            })
+            .unwrap()
+    };
+}
