@@ -54,7 +54,7 @@ pub trait Interceptor {
                 Ok(response) => {
                     let mut stream = response.bytes_stream().eventsource();
                     while let Some(x) = stream.next().await {
-                        println!("{:?}", x);
+                        println!("{:#?}", x);
                         let event = if let Ok(xx) = x {
                             Ok(
                                 warp::filters::sse::Event

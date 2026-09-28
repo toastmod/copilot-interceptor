@@ -68,6 +68,7 @@ mod test {
                                 let d;
                                 if !xx.data.eq("[DONE]") {
                                     d = serde_json::from_str::<OpenAiResponse>(&xx.data).unwrap();
+                                    println!("{:#?}",d);
                                     let data_str = serde_json::to_string(&d).unwrap();
                                     Ok(
                                         warp::filters::sse::Event
