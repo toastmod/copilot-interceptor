@@ -16,6 +16,8 @@ mod test {
     impl CustomService {}
 
     impl Interceptor for CustomService {
+
+        const LLAMA_HOST_URL: &'static str = "http://localhost:11434";
         fn make_client_request_streaming(
             service: Arc<Self>,
             request_body: OpenAiRequest,
@@ -53,7 +55,7 @@ mod test {
             tokio::spawn(async move {
                 match
                     client
-                        .post("http://desktop-ttjki31:10000/v1/chat/completions")
+                        .post(format!("{}/v1/chat/completions", Self::LLAMA_HOST_URL))
                         .headers(headers)
                         .header("Connection", "keep-alive")
                         .json(&request_body)
@@ -111,6 +113,7 @@ mod test {
 
             ReceiverStream::new(rx)
         }
+        
     }
 
     #[tokio::test]

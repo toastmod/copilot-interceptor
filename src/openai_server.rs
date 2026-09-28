@@ -93,7 +93,9 @@ pub struct PromptTokensDetails {
 
 pub struct OpenAiService {}
 
-impl Interceptor for OpenAiService {}
+impl Interceptor for OpenAiService {
+    const LLAMA_HOST_URL: &'static str = "http://localhost:11434";
+}
 
 impl OpenAiService {
     /// Handles the request to list available models.

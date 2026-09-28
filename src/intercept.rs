@@ -8,6 +8,7 @@ use tokio_stream::{ StreamExt, wrappers::ReceiverStream };
 use crate::openai_server::{ OpenAiRequest };
 
 pub trait Interceptor {
+    const LLAMA_HOST_URL: &'static str;
     fn make_client_request_streaming(
         interceptor: Arc<Self>,
         request_body: OpenAiRequest,
@@ -45,7 +46,7 @@ pub trait Interceptor {
         tokio::spawn(async move {
             match
                 client
-                    .post("http://desktop-ttjki31:10000/v1/chat/completions")
+                    .post(format!("{}/v1/chat/completions", Self::LLAMA_HOST_URL))
                     .headers(headers)
                     .header("Connection", "keep-alive")
                     .json(&request_body)

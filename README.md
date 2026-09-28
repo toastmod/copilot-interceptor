@@ -2,7 +2,26 @@
 This is an experimental tool for building interceptors for VSCode Copilot streams to `llama.cpp`.\
 It can be used to make debuggers or add complex logic to local agents.
 
-## Example
+## Quick Example
+```rust
+use copilot_interceptor::prelude::*;
+
+// A simple interception service that prints the stream.
+// Good for debugging.
+struct InterceptorService;
+impl Interceptor for InterceptorService {
+  // Enter your Ollama/llama.cpp server URL like so
+  const LLAMA_HOST_URL: &'static str = "http://localhost:11434";
+}
+
+#[tokio::main]
+async fn main() { 
+    let server = start_server(([0, 0, 0, 0], 10001), InterceptorService {});
+}
+
+```
+
+## Custom Interceptor Example
 ```rust
 use std::sync::Arc;
 use copilot_interceptor::prelude::{ tokio::sync::mpsc, tokio_stream::wrappers::ReceiverStream, * };
@@ -10,6 +29,11 @@ use copilot_interceptor::prelude::{ tokio::sync::mpsc, tokio_stream::wrappers::R
 // Implement a custom interception service.
 struct CustomService;
 impl Interceptor for CustomService {
+
+  // Enter your Ollama/llama.cpp server URL like so
+  const LLAMA_HOST_URL: &'static str = "http://localhost:11434";
+
+  // The following code is the default implementation. 
   fn make_client_request_streaming(
     // You will receive an Arc of your service, so consider atomics or mpsc channels. 
     service: Arc<Self>,
@@ -56,7 +80,8 @@ impl Interceptor for CustomService {
       // Make a request to your local llama.cpp server.
       // Make sure to use the `v1/chat/completions` route. (other APIs aren't supported yet)
       match client
-        .post("http://localhost:10000/v1/chat/completions")
+
+        .post(format!("{}/v1/chat/completions", Self::LLAMA_HOST_URL))
         .headers(headers)
         .header("Connection", "keep-alive")
         .json(&request_body)
